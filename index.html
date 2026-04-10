@@ -179,8 +179,8 @@ document.getElementById("lostForm").addEventListener("submit", async function (e
         image: ""
     };
 
-    await fetch("http://localhost:5000/add-lost", {
-        method: "POST",
+fetch("https://lost-found-finder-vitap-full.onrender.com/add-lost", {
+    method: "POST",
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify(data)
     });
