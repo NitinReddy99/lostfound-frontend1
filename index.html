@@ -204,8 +204,8 @@ document.getElementById("foundForm").addEventListener("submit", async function (
     };
 
     try {
-        let res = await fetch("http://localhost:5000/add-found", {
-            method: "POST",
+fetch("https://lost-found-finder-vitap-full.onrender.com/add-found", {
+    method: "POST",
             headers: {"Content-Type":"application/json"},
             body: JSON.stringify(data)
         });
