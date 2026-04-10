@@ -142,11 +142,10 @@
 
 <script>
 const API = "https://lost-found-finder-vitap-full.onrender.com";
-    const loginForm = document.getElementById("loginForm");
+
+const loginForm = document.getElementById("loginForm");
 const loginPage = document.getElementById("loginPage");
 const portal = document.getElementById("portal");
-const popup = document.getElementById("popup");
-const popupEmail = document.getElementById("popupEmail");
 const itemsList = document.getElementById("itemsList");
 
 loginForm.addEventListener("submit", function (e) {
@@ -156,16 +155,7 @@ loginForm.addEventListener("submit", function (e) {
     loadItems();
 });
 
-function showPopup(email) {
-    popupEmail.innerText = "Owner Email: " + email;
-    popup.style.display = "flex";
-}
-
-function closePopup() {
-    popup.style.display = "none";
-}
-
-// ADD LOST
+// ================== ADD LOST ==================
 document.getElementById("lostForm").addEventListener("submit", async function (e) {
     e.preventDefault();
 
@@ -179,18 +169,27 @@ document.getElementById("lostForm").addEventListener("submit", async function (e
         image: ""
     };
 
-fetch("https://lost-found-finder-vitap-full.onrender.com/add-lost", {
-    method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify(data)
-    });
+    try {
+        let res = await fetch(API + "/add-lost", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify(data)
+        });
 
-    alert("Lost item added");
+        await res.text();
+
+        alert("Lost item added");
+
+    } catch (err) {
+        console.error(err);
+        alert("Error adding lost item");
+    }
+
     this.reset();
     loadItems();
 });
 
-// ADD FOUND
+// ================== ADD FOUND ==================
 document.getElementById("foundForm").addEventListener("submit", async function (e) {
     e.preventDefault();
 
@@ -204,57 +203,63 @@ document.getElementById("foundForm").addEventListener("submit", async function (
     };
 
     try {
-fetch("https://lost-found-finder-vitap-full.onrender.com/add-found", {
-    method: "POST",
+        let res = await fetch(API + "/add-found", {
+            method: "POST",
             headers: {"Content-Type":"application/json"},
             body: JSON.stringify(data)
         });
 
         let result = await res.json();
 
-        console.log(result); // DEBUG
-
-        if (result.match === true) {
-            showPopup(result.email);
+        if (result.match) {
+            alert("Match Found! Contact: " + result.email);
         } else {
             alert("No match found");
         }
 
     } catch (err) {
-    console.error(err);
-    alert("Item found please contact the owner");
-
-}
-
+        console.error(err);
+        alert("Error adding found item");
+    }
 
     this.reset();
     loadItems();
 });
 
-// LOAD ITEMS
+// ================== LOAD ITEMS ==================
 async function loadItems() {
-    let res = await fetch(API + "/items");
-    let items = await res.json();
+    try {
+        let res = await fetch(API + "/items");
+        let items = await res.json();
 
-    itemsList.innerHTML = "";
+        itemsList.innerHTML = "";
 
-    items.forEach(item => {
-        let div = document.createElement("div");
-        div.className = "item";
+        items.forEach(item => {
+            let div = document.createElement("div");
+            div.className = "item";
 
-        div.innerHTML = `
-            <h3>${item.type.toUpperCase()} - ${item.category}</h3>
-            <p>Brand: ${item.brand}</p>
-            <p>Color: ${item.color}</p>
-            <p>Venue: ${item.venue}</p>
-            <p>Description: ${item.description}</p>
-            ${item.email ? `<p><b>Email:</b> ${item.email}</p>` : ""}
-            <p>Status: ${item.status}</p>
-        `;
+            div.innerHTML = `
+                <h3>${item.type.toUpperCase()} - ${item.category}</h3>
+                <p>Brand: ${item.brand}</p>
+                <p>Color: ${item.color}</p>
+                <p>Venue: ${item.venue}</p>
+                <p>Description: ${item.description}</p>
+                ${item.email ? `<p><b>Email:</b> ${item.email}</p>` : ""}
+                <p>Status: ${item.status}</p>
+            `;
 
-        itemsList.appendChild(div);
-    });
+            itemsList.appendChild(div);
+        });
+
+    } catch (err) {
+        console.error(err);
+        alert("Error loading items");
+    }
 }
-</script></body>
+
+// ================== AUTO LOAD ==================
+window.onload = loadItems;
+</script>
+</body>
 </html>
 ```
